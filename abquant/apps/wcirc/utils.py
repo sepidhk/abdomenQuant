@@ -53,7 +53,7 @@ def _measure_circumference(body_array: np.ndarray, pixel_width: float, pixel_uni
     waist_cm = np.round(waist_pixels * pixel_width, 2)
     if pixel_units == 'mm':
         waist_cm = waist_cm / 10
-    return waist_cm
+    return np.round(waist_cm)
 
 
 def get_waist_circumference(axial_array: np.ndarray, l3_slice: np.ndarray, spacing: list) -> float:
