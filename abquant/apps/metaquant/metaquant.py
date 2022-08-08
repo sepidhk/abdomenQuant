@@ -22,10 +22,13 @@ def main(args):
     output_dir = f'{args.output_dir}/MRN{dicom_series.mrn}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    series_info = dicom_series.series_info
     l3_slice, l3_info = predict_l3_slice(args, dicom_series, output_dir)
     l3_body, waist_circ = get_waist_circumference(dicom_series.pixel_array, l3_slice, dicom_series.spacing)
     l3_info['waist_circ'] = waist_circ
-    json.dump(l3_info, open(f'{output_dir}/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_info.json', 'w'))
+    for key, value in l3_info.items():
+        series_info[key] = value
+    json.dump(series_info, open(f'{output_dir}/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_info.json', 'w'))
     if args.plot_outputs:
         outfile = f'{output_dir}/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_waist_contour.png'
         plot_contours(dicom_series.pixel_array[l3_slice], l3_body, outfile)
