@@ -11,6 +11,7 @@ parser.add_argument('--dicom-dir', type=str, help='Directory containing the dico
 parser.add_argument('--slice-model-path', type=str, help='Path to the model')
 parser.add_argument('--slice-model-weights', type=str, help='Path to the model weights')
 parser.add_argument('--output-dir', type=str, help='Directory to save the output')
+parser.add_argument('--plot-outputs', type=bool, help='Plot the outputs', default=True)
 args = parser.parse_args()
 
 
@@ -31,8 +32,9 @@ def main(args, dicom_series=None, output_dir=None):
     prediction = model.predict(image_preprocessed)
     # Change the prediction to original image space
     original_l3 = rescale_prediction(prediction, dicom_series.spacing)
-    # Save the output
-    save_overlay(dicom_series, original_l3, output_dir)
+    if args.plot_outputs:
+        # Save the output
+        save_overlay(dicom_series, original_l3, output_dir)
     slice_info_dict = {'l3': original_l3.tolist()}
     json.dump(slice_info_dict, open(
         output_dir + f'/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_info.json', 'w'))

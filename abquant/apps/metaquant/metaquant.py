@@ -1,9 +1,10 @@
 import argparse
 import os
 import json
+
 from abquant.dicomseries import DicomSeries
 from abquant.apps.l3_detection.predict_l3_slice import main as predict_l3_slice
-from abquant.apps.wcirc.utils import get_waist_circumference
+from abquant.apps.wcirc.utils import get_waist_circumference, plot_contours
 
 
 parser = argparse.ArgumentParser(description='Quantify Metabolic Status from Axial Scan')
@@ -11,6 +12,7 @@ parser.add_argument('--dicom-dir', type=str, help='Directory containing the dico
 parser.add_argument('--slice-model-path', type=str, help='Path to the L3 detection model')
 parser.add_argument('--slice-model-weights', type=str, help='Path to the L3 detection model weights')
 parser.add_argument('--output-dir', type=str, help='Directory to save the output')
+parser.add_argument('--plot-outputs', type=bool, help='Plot the outputs', default=True)
 args = parser.parse_args()
 
 
@@ -21,9 +23,12 @@ def main(args):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     l3_slice, l3_info = predict_l3_slice(args, dicom_series, output_dir)
-    waist_circ = get_waist_circumference(dicom_series.pixel_array, l3_slice, dicom_series.spacing)
+    l3_body, waist_circ = get_waist_circumference(dicom_series.pixel_array, l3_slice, dicom_series.spacing)
     l3_info['waist_circ'] = waist_circ
     json.dump(l3_info, open(f'{output_dir}/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_info.json', 'w'))
+    if args.plot_outputs:
+        outfile = f'{output_dir}/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_waist_contour.png'
+        plot_contours(dicom_series.pixel_array[l3_slice], l3_body, outfile)
     return l3_info
 
 
