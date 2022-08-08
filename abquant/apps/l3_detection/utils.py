@@ -2,6 +2,7 @@ import numpy as np
 from scipy.ndimage import zoom
 import matplotlib.pyplot as plt
 
+
 def normalize_zero_one(image, eps=1e-8):
     image = image.astype(np.float32)
     ret = (image - np.min(image))

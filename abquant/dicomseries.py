@@ -8,7 +8,7 @@ import pydicom
 from numba import njit
 
 
-@njit(cache=True)
+@njit
 def transform_to_hu(image: np.ndarray, slope: float, intercept: float) -> np.ndarray:
     """
     A function to transform a ct scan image into hounsfield units \n
@@ -21,7 +21,7 @@ def transform_to_hu(image: np.ndarray, slope: float, intercept: float) -> np.nda
     return hu_image
 
 
-@njit(cache=True)
+@njit
 def window_image(image: np.ndarray, window_center: int, window_width: int):
     """
     A function to window the hounsfield units of the ct scan \n
