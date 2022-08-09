@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import binary_fill_holes, binary_erosion
-from skimage.measure import label, perimeter, find_contours
+from skimage.measure import label, find_contours, regionprops
 from typing import Tuple, Any
 
 
@@ -22,7 +22,7 @@ def _get_largest_connected_component(binary_image: np.ndarray) -> np.ndarray:
     """
     A function to get the largest connected component from binary image (in this case it should be the body)\n
     :param binary_image: the output from binarize_image
-    :return: an numpy array containing only the largest connected component
+    :return: a numpy array containing only the largest connected component
     """
     labels = label(binary_image)
     unique, counts = np.unique(labels, return_counts=True)
@@ -46,13 +46,16 @@ def _remove_exterior_artifacts(ct_image: np.ndarray, largest_connected_component
 def _measure_circumference(body_array: np.ndarray, pixel_width: float, pixel_units: str = 'mm'):
     """
     Measure the circumference of the body in centimeters\n
-    :param body_array: the output from mark_body
+    :param body_array: the output from binarize_image
     :param pixel_width: the width of a pixel in centimeters
     :param pixel_units: the units of the pixel width (default: mm)
     :return: the circumference of the body in centimeters
     """
-    waist_pixels = perimeter(body_array, neighbourhood=4)
-    waist_cm = np.round(waist_pixels * pixel_width, 2)
+    labels = label(body_array)
+    regions = regionprops(labels)
+    waist_perimeter = max(regions, key=lambda x: x.area).perimeter
+    # waist_pixels = perimeter(body_array, neighbourhood=4)
+    waist_cm = np.round(waist_perimeter * pixel_width, 2)
     if pixel_units == 'mm':
         waist_cm = waist_cm / 10
     return np.round(waist_cm)
@@ -78,11 +81,13 @@ def get_waist_circumference(axial_array: np.ndarray, l3_slice: np.ndarray, spaci
     waist_circ = _measure_circumference(l3_pp, spacing[0])
     return l3_pp, waist_circ
 
+
 def plot_contours(original_image, body_mask, output_path):
     """
     A function to plot the contours of the waist circumference around original image
     :param original_image: the original L3 slice
     :param body_mask: the body mask
+    :param output_path: the path to save the plot
     :return: the plot of the contours
     """
     contours = find_contours(body_mask)
