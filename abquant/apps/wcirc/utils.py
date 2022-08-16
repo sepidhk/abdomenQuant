@@ -77,7 +77,7 @@ def get_waist_circumference(axial_array: np.ndarray, l3_slice: np.ndarray, spaci
     # Measure circumference
     l3_pp = _binarize_image(l3_pp)
     # Erosion is to remove small artifacts attached to body (clips from table, etc
-    l3_pp = binary_erosion(l3_pp, iterations=2)
+    l3_pp = binary_erosion(l3_pp, iterations=4)
     waist_circ = _measure_circumference(l3_pp, spacing[0])
     return l3_pp, waist_circ
 
