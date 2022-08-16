@@ -58,9 +58,10 @@ def preprocess_for_detection(image, spacing, target_spacing, min_height=512, min
 
 
 def rescale_prediction(prediction, original_spacing):
+    probability = np.max(prediction[0])
     slice_n = np.argmax(prediction[0])
     slice_n = np.int16(slice_n // original_spacing[2])
-    return slice_n
+    return slice_n, probability
 
 
 def save_overlay(dicom_series, slice_loc, output_dir):

@@ -31,11 +31,11 @@ def main(args, dicom_series=None, output_dir=None):
     # Predict the L3 slice location
     prediction = model.predict(image_preprocessed)
     # Change the prediction to original image space
-    original_l3 = rescale_prediction(prediction, dicom_series.spacing)
+    original_l3, probability = rescale_prediction(prediction, dicom_series.spacing)
     if args.plot_outputs:
         # Save the output
         save_overlay(dicom_series, original_l3, output_dir)
-    slice_info_dict = {'l3': original_l3.tolist()}
+    slice_info_dict = {'l3': original_l3.tolist(), 'confidence': probability.tolist()}
     json.dump(slice_info_dict, open(
         output_dir + f'/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_l3_info.json', 'w'))
 
