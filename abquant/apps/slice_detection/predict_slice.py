@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 
-from abquant.dicomseries import DicomSeries
+from abdomenQuant.abquant.dicomseries import DicomSeries
 from .model import load_model
 from .utils import preprocess_for_detection, rescale_prediction, save_overlay
 
