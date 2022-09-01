@@ -33,8 +33,8 @@ def main(args):
             series_info[key] = value
     if args.plot_outputs:
         fig = plt.imshow(dicom_series.frontal)
-        for vertebra in ['l1', 'l3', 'l5']:
-            plt.axhline(series_info[vertebra], color='y')
+        for vertebra, color in zip(['l1', 'l3', 'l5'], ['r', 'y', 'g']):
+            plt.axhline(series_info[vertebra], color=color)
         plt.savefig(f'{output_dir}/{dicom_series.mrn}_{dicom_series.accession}_{dicom_series.cut}_slice_overlay.png')
     l3_body, waist_circ = get_waist_circumference(dicom_series.pixel_array, series_info['l3'], dicom_series.spacing)
     series_info['l3_waist_circ'] = waist_circ
